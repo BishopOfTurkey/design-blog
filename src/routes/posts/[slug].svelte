@@ -27,6 +27,7 @@
 
   article :global(p) {
     line-height: normal;
+    text-align: justify;
   }
   article {
     margin-bottom: 25px;

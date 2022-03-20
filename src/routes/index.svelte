@@ -10,7 +10,7 @@
 
 <h1>Welcome to my DESN2010 Blog</h1>
 <p>
-  This is still a work in progress! (content and site) 
+  This is still a work in progress (content and site)! 
   I've used this blog as an opportunity to learn a new way of creating websites.
 </p>
 
