@@ -8,7 +8,7 @@
 		<meta http-equiv="content-security-policy" content=""><title>week-06-assignment1-reflection-and-documentation | DESN2010 Blog</title>
 	<link rel="stylesheet" href="/_app/assets/pages/__layout.svelte-85f7ebf5.css">
 	<link rel="stylesheet" href="/_app/assets/pages/posts/_slug_.svelte-7d1e5a95.css">
-	<link rel="modulepreload" href="/_app/start-1f164963.js">
+	<link rel="modulepreload" href="/_app/start-340e27e4.js">
 	<link rel="modulepreload" href="/_app/chunks/vendor-0cbe9c9d.js">
 	<link rel="modulepreload" href="/_app/pages/__layout.svelte-ff561948.js">
 	<link rel="modulepreload" href="/_app/pages/posts/_slug_.svelte-7e7deca4.js">
@@ -23,24 +23,171 @@
 
 <article class="svelte-1wchouu"><!-- HTML_TAG_START --><h1>Week 6 - Assignment 1 Reflection &#x26; Documentation</h1>
 <h2>Documentation</h2>
+<h3>Setting up the the Heart Rate Monitor</h3>
+<p><img src="/hb-sensor.jpg" alt="heartbeat">
+<em>Source: Jaycar</em></p>
+<p>The MAX3010x sensor has a good library from SparkFun available which includes
+examples. I first got the sensor connected to Arduino according to the instruction
+given in the example file. This was relatively painless. It took a while to figure
+out how to position the sensor in order to get a good reading. Other than that
+this is a relatively simple process.</p>
+<p>Library: <a href="https://github.com/sparkfun/SparkFun_MAX3010x_Sensor_Library">SparkFun MAX3010x Sensor Library</a></p>
 <h3>Building and connecting the Pen</h3>
-<h3>Connecting the Heart Rate Monitor</h3>
-<h3>Combining the two in code</h3>
-<ul>
-<li>Positive or Negative Feedback loop</li>
-</ul>
+<p><img src="/pen_simple.JPG" alt="pen"></p>
+<p>The pen is a very simple construction, it is a simple ball point pen with a servo
+hot glued to it. The servo moves the ink chamber and ball point through the barrel
+(<a href="https://www.pens.com/blog/parts-of-a-pen/">yes that's what they are called</a>)
+so the ball point of the pen moves up and down relative to what you are writing on.</p>
+<p>Servo's are very easy to control when utilising the Arduino standard library,
+as previously mention in the blog.
+I got the pen working in code very quickly. I just needed to calibrate the top
+and bottom values for the servo so that it wouldn't rip itself apart.</p>
+<h3>Integrating the heart rate monitor and pen</h3>
+<p>After getting both the heart rate monitor and pen working individually I worked
+on making the heart rate impact the pen. This was done with a <code>map</code> function and
+some variation using the <code>random</code> function. The final commented code can be seen
+below.</p>
 <h3>Testing</h3>
-<h2>Reflection</h2><!-- HTML_TAG_END -->
+<p>When I finished building and coding the pen I let my roommate try it out. His
+reaction was exactly what I had aimed for in the design. As he used the pen he
+became more agitated and frustrated by it's movement, this caused the pen to
+become harder to use.</p>
+<video style="max-width: 800px; width: auto;" controls>
+  <source src="/tali_pen.MOV" type="video/mp4">
+</video>
+<p>One problem was that the heart rate sensor often failed or gave strange reasons.
+While this is technically a problem it didn't really impact the actual result.
+A bit more variation was probably good as it made the pen even harder to get a handle on.</p>
+<h2>Reflection</h2>
+<p>Overall this project went really well, the class well responded to the justification
+and implementation. Having
+someone from the class doing a live demo was also important and very successful.
+After the first demonstration someone else in the class even wanted to give it a
+go!</p>
+<p>The discussion in class was also very interesting. A few points that got brought
+up were:</p>
+<ul>
+<li>Should the feedback loop be switched be negative so it instead calms you down</li>
+<li>Where is the kickstarter?! 😆</li>
+<li>If a direct more feedback mechanism was implemented (e.g. vibration)
+you might be able to control the system better. The current feedback mechanism
+is quite slow and your mind maybe fails to make the intuitive link which would
+allow your body to regulate your heartrate.</li>
+</ul>
+<h2>Appendix</h2>
+<h3>Download: <a href="/pen.ino"><code>pen.ino</code></a></h3>
+<pre><code class="hljs language-arduino"><span class="hljs-comment">/*
+ * Adapted from Examples -> Servo -> Sweep &#x26; Examples -> SparkFun MAX3010x Pluse and Proxmity Sensor Library -> Example_5 Plotter
+ * All other code my own.
+ * 
+ * 
+ * Copyright Obi Symons 2021 - Creative Commons Attribution 4.0 International Public License (https://creativecommons.org/licenses/by/4.0/)
+ */</span>
+
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;Servo.h></span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;Wire.h></span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">"MAX30105.h"</span></span>
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">"heartRate.h"</span></span>
+
+<span class="hljs-built_in">Servo</span> myservo;  <span class="hljs-comment">// create servo object to control a servo</span>
+
+<span class="hljs-type">int</span> pos = <span class="hljs-number">0</span>;    <span class="hljs-comment">// Variable to store the servo position</span>
+<span class="hljs-type">int</span> top = <span class="hljs-number">180</span>;  <span class="hljs-comment">// Top and bottom values based for the pen so it doesn't rip itself apart.</span>
+<span class="hljs-type">int</span> bot = <span class="hljs-number">45</span>;
+
+
+MAX30105 particleSensor; <span class="hljs-comment">// Create the sensor object.</span>
+
+
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setup</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">begin</span>(<span class="hljs-number">115200</span>); 
+  <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">println</span>(<span class="hljs-string">"Initializing..."</span>);
+  
+  myservo.<span class="hljs-built_in">attach</span>(<span class="hljs-number">9</span>);  <span class="hljs-comment">// attaches the servo on pin 9 to the servo object</span>
+  myservo.<span class="hljs-built_in">write</span>(bot); <span class="hljs-comment">// Move the servo to the normal writing position</span>
+
+  <span class="hljs-comment">// Initialize sensor</span>
+  <span class="hljs-keyword">if</span> (!particleSensor.<span class="hljs-built_in">begin</span>(<span class="hljs-built_in">Wire</span>, I2C_SPEED_FAST)) <span class="hljs-comment">//Use default I2C port, 400kHz speed</span>
+  {
+    <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">println</span>(<span class="hljs-string">"MAX30105 was not found. Please check wiring/power. "</span>);
+    <span class="hljs-keyword">while</span> (<span class="hljs-number">1</span>);
+  }
+  <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">println</span>(<span class="hljs-string">"Place your index finger on the sensor with steady pressure."</span>); 
+
+  particleSensor.<span class="hljs-built_in">setup</span>(); <span class="hljs-comment">//Configure sensor with default settings</span>
+  particleSensor.<span class="hljs-built_in">setPulseAmplitudeRed</span>(<span class="hljs-number">0x0A</span>); <span class="hljs-comment">//Turn Red LED to low to indicate sensor is running</span>
+  particleSensor.<span class="hljs-built_in">setPulseAmplitudeGreen</span>(<span class="hljs-number">0</span>); <span class="hljs-comment">//Turn off Green LED</span>
+
+  <span class="hljs-comment">// End Initialize sensor</span>
+}
+
+<span class="hljs-comment">// Variables for storing average heartrate</span>
+<span class="hljs-type">const</span> <span class="hljs-type">byte</span> RATE_SIZE = <span class="hljs-number">4</span>; <span class="hljs-comment">//Increase this for more averaging. 4 is good.</span>
+<span class="hljs-type">byte</span> rates[RATE_SIZE]; <span class="hljs-comment">//Array of heart rates</span>
+<span class="hljs-type">byte</span> rateSpot = <span class="hljs-number">0</span>;
+<span class="hljs-type">long</span> lastBeat = <span class="hljs-number">0</span>; <span class="hljs-comment">//Time at which the last beat occurred</span>
+
+<span class="hljs-type">float</span> beatsPerMinute;
+<span class="hljs-type">int</span> beatAvg;
+
+<span class="hljs-comment">// Storing last movement time of the pen.</span>
+<span class="hljs-type">long</span> lastServoChange = <span class="hljs-number">0</span>;
+<span class="hljs-type">int</span> updateInterval = <span class="hljs-number">1000</span>;
+
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">loop</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-comment">// Get the IR value from the heartbeat sensor.</span>
+  <span class="hljs-type">long</span> irValue = particleSensor.<span class="hljs-built_in">getIR</span>();
+
+  <span class="hljs-comment">// Find a beat (Uses "heartRate.h" included with the library)</span>
+  <span class="hljs-keyword">if</span> (<span class="hljs-built_in">checkForBeat</span>(irValue) == <span class="hljs-literal">true</span>)
+  {
+    <span class="hljs-comment">//We sensed a beat!</span>
+    <span class="hljs-type">long</span> delta = <span class="hljs-built_in">millis</span>() - lastBeat;
+    lastBeat = <span class="hljs-built_in">millis</span>();
+
+    <span class="hljs-comment">// Calculate the heartrate and the average</span>
+    beatsPerMinute = <span class="hljs-number">60</span> / (delta / <span class="hljs-number">1000.0</span>);
+
+    <span class="hljs-keyword">if</span> (beatsPerMinute &#x3C; <span class="hljs-number">255</span> &#x26;&#x26; beatsPerMinute > <span class="hljs-number">20</span>)
+    {
+      rates[rateSpot++] = (<span class="hljs-type">byte</span>)beatsPerMinute; <span class="hljs-comment">//Store this reading in the array</span>
+      rateSpot %= RATE_SIZE; <span class="hljs-comment">//Wrap variable</span>
+
+      <span class="hljs-comment">//Take average of readings</span>
+      beatAvg = <span class="hljs-number">0</span>;
+      <span class="hljs-keyword">for</span> (<span class="hljs-type">byte</span> x = <span class="hljs-number">0</span> ; x &#x3C; RATE_SIZE ; x++)
+        beatAvg += rates[x];
+      beatAvg /= RATE_SIZE;
+    }
+  }
+  <span class="hljs-comment">// Change how often we update the pen based on the average heartrate (between 1 and .3 seconds)</span>
+  updateInterval = <span class="hljs-built_in">map</span>(beatAvg, <span class="hljs-number">60</span>, <span class="hljs-number">100</span>, <span class="hljs-number">1000</span>, <span class="hljs-number">300</span>);
+
+  <span class="hljs-keyword">if</span> (<span class="hljs-built_in">millis</span>() - lastServoChange > updateInterval) { <span class="hljs-comment">// Check if we need to update the pen position</span>
+    <span class="hljs-type">int</span> variability = <span class="hljs-built_in">map</span>(beatAvg, <span class="hljs-number">60</span>, <span class="hljs-number">100</span>, bot, top); <span class="hljs-comment">// Map the heart rate to pen positions.</span>
+    pos = <span class="hljs-built_in">random</span>(bot, <span class="hljs-built_in">min</span>(variability, top)); <span class="hljs-comment">// Choice a random position depending on the heartrate</span>
+    myservo.<span class="hljs-built_in">write</span>(pos);
+    lastServoChange = <span class="hljs-built_in">millis</span>(); <span class="hljs-comment">// Reset the time since last change.</span>
+    <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">print</span>(<span class="hljs-string">"Avg BPM="</span>); <span class="hljs-comment">// print out the Avg BPM for debugging</span>
+    <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">print</span>(beatAvg);
+
+    <span class="hljs-keyword">if</span> (irValue &#x3C; <span class="hljs-number">50000</span>) <span class="hljs-comment">// Warn the user they don't have the sensor positioned on their finger.</span>
+      <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">print</span>(<span class="hljs-string">" No finger?"</span>);
+
+     <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">println</span>();
+  }
+}
+</code></pre><!-- HTML_TAG_END -->
 </article></div></main>
 
 <footer class="svelte-1mzt4ot"><div class="svelte-1mzt4ot"><p>Obi Symons © 2022 - <a href="https://creativecommons.org/licenses/by/4.0/" class="svelte-1mzt4ot">Creative Commons Attribution 4.0 International Public License</a> <em>Made with Svelte</em></p></div>
 </footer>
 
 
-		<script type="module" data-hydrate="15slurc">
-		import { start } from "/_app/start-1f164963.js";
+		<script type="module" data-hydrate="6cpthh">
+		import { start } from "/_app/start-340e27e4.js";
 		start({
-			target: document.querySelector('[data-hydrate="15slurc"]').parentNode,
+			target: document.querySelector('[data-hydrate="6cpthh"]').parentNode,
 			paths: {"base":"","assets":""},
 			session: {},
 			route: true,
@@ -57,6 +204,6 @@
 				routeId: "posts/[slug]"
 			}
 		});
-	</script><script type="application/json" sveltekit:data-type="props">{"title":"week-06-assignment1-reflection-and-documentation","html":"\u003Ch1>Week 6 - Assignment 1 Reflection &#x26; Documentation\u003C/h1>\n\u003Ch2>Documentation\u003C/h2>\n\u003Ch3>Building and connecting the Pen\u003C/h3>\n\u003Ch3>Connecting the Heart Rate Monitor\u003C/h3>\n\u003Ch3>Combining the two in code\u003C/h3>\n\u003Cul>\n\u003Cli>Positive or Negative Feedback loop\u003C/li>\n\u003C/ul>\n\u003Ch3>Testing\u003C/h3>\n\u003Ch2>Reflection\u003C/h2>"}</script>
+	</script><script type="application/json" sveltekit:data-type="props">{"title":"week-06-assignment1-reflection-and-documentation","html":"\u003Ch1>Week 6 - Assignment 1 Reflection &#x26; Documentation\u003C/h1>\n\u003Ch2>Documentation\u003C/h2>\n\u003Ch3>Setting up the the Heart Rate Monitor\u003C/h3>\n\u003Cp>\u003Cimg src=\"/hb-sensor.jpg\" alt=\"heartbeat\">\n\u003Cem>Source: Jaycar\u003C/em>\u003C/p>\n\u003Cp>The MAX3010x sensor has a good library from SparkFun available which includes\nexamples. I first got the sensor connected to Arduino according to the instruction\ngiven in the example file. This was relatively painless. It took a while to figure\nout how to position the sensor in order to get a good reading. Other than that\nthis is a relatively simple process.\u003C/p>\n\u003Cp>Library: \u003Ca href=\"https://github.com/sparkfun/SparkFun_MAX3010x_Sensor_Library\">SparkFun MAX3010x Sensor Library\u003C/a>\u003C/p>\n\u003Ch3>Building and connecting the Pen\u003C/h3>\n\u003Cp>\u003Cimg src=\"/pen_simple.JPG\" alt=\"pen\">\u003C/p>\n\u003Cp>The pen is a very simple construction, it is a simple ball point pen with a servo\nhot glued to it. The servo moves the ink chamber and ball point through the barrel\n(\u003Ca href=\"https://www.pens.com/blog/parts-of-a-pen/\">yes that's what they are called\u003C/a>)\nso the ball point of the pen moves up and down relative to what you are writing on.\u003C/p>\n\u003Cp>Servo's are very easy to control when utilising the Arduino standard library,\nas previously mention in the blog.\nI got the pen working in code very quickly. I just needed to calibrate the top\nand bottom values for the servo so that it wouldn't rip itself apart.\u003C/p>\n\u003Ch3>Integrating the heart rate monitor and pen\u003C/h3>\n\u003Cp>After getting both the heart rate monitor and pen working individually I worked\non making the heart rate impact the pen. This was done with a \u003Ccode>map\u003C/code> function and\nsome variation using the \u003Ccode>random\u003C/code> function. The final commented code can be seen\nbelow.\u003C/p>\n\u003Ch3>Testing\u003C/h3>\n\u003Cp>When I finished building and coding the pen I let my roommate try it out. His\nreaction was exactly what I had aimed for in the design. As he used the pen he\nbecame more agitated and frustrated by it's movement, this caused the pen to\nbecome harder to use.\u003C/p>\n\u003Cvideo style=\"max-width: 800px; width: auto;\" controls>\n  \u003Csource src=\"/tali_pen.MOV\" type=\"video/mp4\">\n\u003C/video>\n\u003Cp>One problem was that the heart rate sensor often failed or gave strange reasons.\nWhile this is technically a problem it didn't really impact the actual result.\nA bit more variation was probably good as it made the pen even harder to get a handle on.\u003C/p>\n\u003Ch2>Reflection\u003C/h2>\n\u003Cp>Overall this project went really well, the class well responded to the justification\nand implementation. Having\nsomeone from the class doing a live demo was also important and very successful.\nAfter the first demonstration someone else in the class even wanted to give it a\ngo!\u003C/p>\n\u003Cp>The discussion in class was also very interesting. A few points that got brought\nup were:\u003C/p>\n\u003Cul>\n\u003Cli>Should the feedback loop be switched be negative so it instead calms you down\u003C/li>\n\u003Cli>Where is the kickstarter?! 😆\u003C/li>\n\u003Cli>If a direct more feedback mechanism was implemented (e.g. vibration)\nyou might be able to control the system better. The current feedback mechanism\nis quite slow and your mind maybe fails to make the intuitive link which would\nallow your body to regulate your heartrate.\u003C/li>\n\u003C/ul>\n\u003Ch2>Appendix\u003C/h2>\n\u003Ch3>Download: \u003Ca href=\"/pen.ino\">\u003Ccode>pen.ino\u003C/code>\u003C/a>\u003C/h3>\n\u003Cpre>\u003Ccode class=\"hljs language-arduino\">\u003Cspan class=\"hljs-comment\">/*\n * Adapted from Examples -> Servo -> Sweep &#x26; Examples -> SparkFun MAX3010x Pluse and Proxmity Sensor Library -> Example_5 Plotter\n * All other code my own.\n * \n * \n * Copyright Obi Symons 2021 - Creative Commons Attribution 4.0 International Public License (https://creativecommons.org/licenses/by/4.0/)\n */\u003C/span>\n\n\u003Cspan class=\"hljs-meta\">#\u003Cspan class=\"hljs-keyword\">include\u003C/span> \u003Cspan class=\"hljs-string\">&#x3C;Servo.h>\u003C/span>\u003C/span>\n\u003Cspan class=\"hljs-meta\">#\u003Cspan class=\"hljs-keyword\">include\u003C/span> \u003Cspan class=\"hljs-string\">&#x3C;Wire.h>\u003C/span>\u003C/span>\n\u003Cspan class=\"hljs-meta\">#\u003Cspan class=\"hljs-keyword\">include\u003C/span> \u003Cspan class=\"hljs-string\">\"MAX30105.h\"\u003C/span>\u003C/span>\n\u003Cspan class=\"hljs-meta\">#\u003Cspan class=\"hljs-keyword\">include\u003C/span> \u003Cspan class=\"hljs-string\">\"heartRate.h\"\u003C/span>\u003C/span>\n\n\u003Cspan class=\"hljs-built_in\">Servo\u003C/span> myservo;  \u003Cspan class=\"hljs-comment\">// create servo object to control a servo\u003C/span>\n\n\u003Cspan class=\"hljs-type\">int\u003C/span> pos = \u003Cspan class=\"hljs-number\">0\u003C/span>;    \u003Cspan class=\"hljs-comment\">// Variable to store the servo position\u003C/span>\n\u003Cspan class=\"hljs-type\">int\u003C/span> top = \u003Cspan class=\"hljs-number\">180\u003C/span>;  \u003Cspan class=\"hljs-comment\">// Top and bottom values based for the pen so it doesn't rip itself apart.\u003C/span>\n\u003Cspan class=\"hljs-type\">int\u003C/span> bot = \u003Cspan class=\"hljs-number\">45\u003C/span>;\n\n\nMAX30105 particleSensor; \u003Cspan class=\"hljs-comment\">// Create the sensor object.\u003C/span>\n\n\n\u003Cspan class=\"hljs-function\">\u003Cspan class=\"hljs-type\">void\u003C/span> \u003Cspan class=\"hljs-title\">setup\u003C/span>\u003Cspan class=\"hljs-params\">()\u003C/span> \u003C/span>{\n  \u003Cspan class=\"hljs-built_in\">Serial\u003C/span>.\u003Cspan class=\"hljs-built_in\">begin\u003C/span>(\u003Cspan class=\"hljs-number\">115200\u003C/span>); \n  \u003Cspan class=\"hljs-built_in\">Serial\u003C/span>.\u003Cspan class=\"hljs-built_in\">println\u003C/span>(\u003Cspan class=\"hljs-string\">\"Initializing...\"\u003C/span>);\n  \n  myservo.\u003Cspan class=\"hljs-built_in\">attach\u003C/span>(\u003Cspan class=\"hljs-number\">9\u003C/span>);  \u003Cspan class=\"hljs-comment\">// attaches the servo on pin 9 to the servo object\u003C/span>\n  myservo.\u003Cspan class=\"hljs-built_in\">write\u003C/span>(bot); \u003Cspan class=\"hljs-comment\">// Move the servo to the normal writing position\u003C/span>\n\n  \u003Cspan class=\"hljs-comment\">// Initialize sensor\u003C/span>\n  \u003Cspan class=\"hljs-keyword\">if\u003C/span> (!particleSensor.\u003Cspan class=\"hljs-built_in\">begin\u003C/span>(\u003Cspan class=\"hljs-built_in\">Wire\u003C/span>, I2C_SPEED_FAST)) \u003Cspan class=\"hljs-comment\">//Use default I2C port, 400kHz speed\u003C/span>\n  {\n    \u003Cspan class=\"hljs-built_in\">Serial\u003C/span>.\u003Cspan class=\"hljs-built_in\">println\u003C/span>(\u003Cspan class=\"hljs-string\">\"MAX30105 was not found. Please check wiring/power. \"\u003C/span>);\n    \u003Cspan class=\"hljs-keyword\">while\u003C/span> (\u003Cspan class=\"hljs-number\">1\u003C/span>);\n  }\n  \u003Cspan class=\"hljs-built_in\">Serial\u003C/span>.\u003Cspan class=\"hljs-built_in\">println\u003C/span>(\u003Cspan class=\"hljs-string\">\"Place your index finger on the sensor with steady pressure.\"\u003C/span>); \n\n  particleSensor.\u003Cspan class=\"hljs-built_in\">setup\u003C/span>(); \u003Cspan class=\"hljs-comment\">//Configure sensor with default settings\u003C/span>\n  particleSensor.\u003Cspan class=\"hljs-built_in\">setPulseAmplitudeRed\u003C/span>(\u003Cspan class=\"hljs-number\">0x0A\u003C/span>); \u003Cspan class=\"hljs-comment\">//Turn Red LED to low to indicate sensor is running\u003C/span>\n  particleSensor.\u003Cspan class=\"hljs-built_in\">setPulseAmplitudeGreen\u003C/span>(\u003Cspan class=\"hljs-number\">0\u003C/span>); \u003Cspan class=\"hljs-comment\">//Turn off Green LED\u003C/span>\n\n  \u003Cspan class=\"hljs-comment\">// End Initialize sensor\u003C/span>\n}\n\n\u003Cspan class=\"hljs-comment\">// Variables for storing average heartrate\u003C/span>\n\u003Cspan class=\"hljs-type\">const\u003C/span> \u003Cspan class=\"hljs-type\">byte\u003C/span> RATE_SIZE = \u003Cspan class=\"hljs-number\">4\u003C/span>; \u003Cspan class=\"hljs-comment\">//Increase this for more averaging. 4 is good.\u003C/span>\n\u003Cspan class=\"hljs-type\">byte\u003C/span> rates[RATE_SIZE]; \u003Cspan class=\"hljs-comment\">//Array of heart rates\u003C/span>\n\u003Cspan class=\"hljs-type\">byte\u003C/span> rateSpot = \u003Cspan class=\"hljs-number\">0\u003C/span>;\n\u003Cspan class=\"hljs-type\">long\u003C/span> lastBeat = \u003Cspan class=\"hljs-number\">0\u003C/span>; \u003Cspan class=\"hljs-comment\">//Time at which the last beat occurred\u003C/span>\n\n\u003Cspan class=\"hljs-type\">float\u003C/span> beatsPerMinute;\n\u003Cspan class=\"hljs-type\">int\u003C/span> beatAvg;\n\n\u003Cspan class=\"hljs-comment\">// Storing last movement time of the pen.\u003C/span>\n\u003Cspan class=\"hljs-type\">long\u003C/span> lastServoChange = \u003Cspan class=\"hljs-number\">0\u003C/span>;\n\u003Cspan class=\"hljs-type\">int\u003C/span> updateInterval = \u003Cspan class=\"hljs-number\">1000\u003C/span>;\n\n\u003Cspan class=\"hljs-function\">\u003Cspan class=\"hljs-type\">void\u003C/span> \u003Cspan class=\"hljs-title\">loop\u003C/span>\u003Cspan class=\"hljs-params\">()\u003C/span> \u003C/span>{\n  \u003Cspan class=\"hljs-comment\">// Get the IR value from the heartbeat sensor.\u003C/span>\n  \u003Cspan class=\"hljs-type\">long\u003C/span> irValue = particleSensor.\u003Cspan class=\"hljs-built_in\">getIR\u003C/span>();\n\n  \u003Cspan class=\"hljs-comment\">// Find a beat (Uses \"heartRate.h\" included with the library)\u003C/span>\n  \u003Cspan class=\"hljs-keyword\">if\u003C/span> (\u003Cspan class=\"hljs-built_in\">checkForBeat\u003C/span>(irValue) == \u003Cspan class=\"hljs-literal\">true\u003C/span>)\n  {\n    \u003Cspan class=\"hljs-comment\">//We sensed a beat!\u003C/span>\n    \u003Cspan class=\"hljs-type\">long\u003C/span> delta = \u003Cspan class=\"hljs-built_in\">millis\u003C/span>() - lastBeat;\n    lastBeat = \u003Cspan class=\"hljs-built_in\">millis\u003C/span>();\n\n    \u003Cspan class=\"hljs-comment\">// Calculate the heartrate and the average\u003C/span>\n    beatsPerMinute = \u003Cspan class=\"hljs-number\">60\u003C/span> / (delta / \u003Cspan class=\"hljs-number\">1000.0\u003C/span>);\n\n    \u003Cspan class=\"hljs-keyword\">if\u003C/span> (beatsPerMinute &#x3C; \u003Cspan class=\"hljs-number\">255\u003C/span> &#x26;&#x26; beatsPerMinute > \u003Cspan class=\"hljs-number\">20\u003C/span>)\n    {\n      rates[rateSpot++] = (\u003Cspan class=\"hljs-type\">byte\u003C/span>)beatsPerMinute; \u003Cspan class=\"hljs-comment\">//Store this reading in the array\u003C/span>\n      rateSpot %= RATE_SIZE; \u003Cspan class=\"hljs-comment\">//Wrap variable\u003C/span>\n\n      \u003Cspan class=\"hljs-comment\">//Take average of readings\u003C/span>\n      beatAvg = \u003Cspan class=\"hljs-number\">0\u003C/span>;\n      \u003Cspan class=\"hljs-keyword\">for\u003C/span> (\u003Cspan class=\"hljs-type\">byte\u003C/span> x = \u003Cspan class=\"hljs-number\">0\u003C/span> ; x &#x3C; RATE_SIZE ; x++)\n        beatAvg += rates[x];\n      beatAvg /= RATE_SIZE;\n    }\n  }\n  \u003Cspan class=\"hljs-comment\">// Change how often we update the pen based on the average heartrate (between 1 and .3 seconds)\u003C/span>\n  updateInterval = \u003Cspan class=\"hljs-built_in\">map\u003C/span>(beatAvg, \u003Cspan class=\"hljs-number\">60\u003C/span>, \u003Cspan class=\"hljs-number\">100\u003C/span>, \u003Cspan class=\"hljs-number\">1000\u003C/span>, \u003Cspan class=\"hljs-number\">300\u003C/span>);\n\n  \u003Cspan class=\"hljs-keyword\">if\u003C/span> (\u003Cspan class=\"hljs-built_in\">millis\u003C/span>() - lastServoChange > updateInterval) { \u003Cspan class=\"hljs-comment\">// Check if we need to update the pen position\u003C/span>\n    \u003Cspan class=\"hljs-type\">int\u003C/span> variability = \u003Cspan class=\"hljs-built_in\">map\u003C/span>(beatAvg, \u003Cspan class=\"hljs-number\">60\u003C/span>, \u003Cspan class=\"hljs-number\">100\u003C/span>, bot, top); \u003Cspan class=\"hljs-comment\">// Map the heart rate to pen positions.\u003C/span>\n    pos = \u003Cspan class=\"hljs-built_in\">random\u003C/span>(bot, \u003Cspan class=\"hljs-built_in\">min\u003C/span>(variability, top)); \u003Cspan class=\"hljs-comment\">// Choice a random position depending on the heartrate\u003C/span>\n    myservo.\u003Cspan class=\"hljs-built_in\">write\u003C/span>(pos);\n    lastServoChange = \u003Cspan class=\"hljs-built_in\">millis\u003C/span>(); \u003Cspan class=\"hljs-comment\">// Reset the time since last change.\u003C/span>\n    \u003Cspan class=\"hljs-built_in\">Serial\u003C/span>.\u003Cspan class=\"hljs-built_in\">print\u003C/span>(\u003Cspan class=\"hljs-string\">\"Avg BPM=\"\u003C/span>); \u003Cspan class=\"hljs-comment\">// print out the Avg BPM for debugging\u003C/span>\n    \u003Cspan class=\"hljs-built_in\">Serial\u003C/span>.\u003Cspan class=\"hljs-built_in\">print\u003C/span>(beatAvg);\n\n    \u003Cspan class=\"hljs-keyword\">if\u003C/span> (irValue &#x3C; \u003Cspan class=\"hljs-number\">50000\u003C/span>) \u003Cspan class=\"hljs-comment\">// Warn the user they don't have the sensor positioned on their finger.\u003C/span>\n      \u003Cspan class=\"hljs-built_in\">Serial\u003C/span>.\u003Cspan class=\"hljs-built_in\">print\u003C/span>(\u003Cspan class=\"hljs-string\">\" No finger?\"\u003C/span>);\n\n     \u003Cspan class=\"hljs-built_in\">Serial\u003C/span>.\u003Cspan class=\"hljs-built_in\">println\u003C/span>();\n  }\n}\n\u003C/code>\u003C/pre>"}</script>
 	</body>
 </html>
