@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="description" content="" />
+		<link rel="icon" href="../favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta http-equiv="content-security-policy" content=""><title>week-01-3-blinky-buzzy | DESN2010 Blog</title>
+	<link rel="stylesheet" href="/_app/assets/pages/__layout.svelte-85f7ebf5.css">
+	<link rel="stylesheet" href="/_app/assets/pages/posts/_slug_.svelte-7d1e5a95.css">
+	<link rel="modulepreload" href="/_app/start-1f164963.js">
+	<link rel="modulepreload" href="/_app/chunks/vendor-0cbe9c9d.js">
+	<link rel="modulepreload" href="/_app/pages/__layout.svelte-ff561948.js">
+	<link rel="modulepreload" href="/_app/pages/posts/_slug_.svelte-7e7deca4.js">
+	</head>
+	<body>
+		
+
+
+<header class="svelte-1mzt4ot"><div class="svelte-1mzt4ot"><h1><a href="/" class="svelte-1mzt4ot">DESN2010 Blog</a></h1></div></header>
+
+<main class="svelte-1mzt4ot"><div class="svelte-1mzt4ot">
+
+<article class="svelte-1wchouu"><!-- HTML_TAG_START --><h1>Blinky Buzzy － Weeks 1 - 3</h1>
+<h2>Arduino!</h2>
+<p><img src="/leds.png" alt="addressable LEDs!">
+<em>A representation of the Federal Senate using addressable LEDs</em></p>
+<p>I spent a lot of time with Arduino's back in high school mostly creating flashing
+light displays with addressable LEDs. However, it's been a while since I've used
+Arduino as I was wooed away by the fancier microcontrollers such as the ESP32
+with wifi &#x26; bluetooth and the STM32 with a fast clock rate &#x26; modern(ish)
+CPU architecture.</p>
+<p>That being said, I'm looking forward to re-exploring what is a
+wonderful ecosystem and expressive  community of makers.</p>
+<p>As I've had a bit of experience building things with Arduino I've combined the
+first three weeks of blogs into one.</p>
+<h2>Connections and Saying Hello!</h2>
+<p>In order to say hello (in an arduino kind of way), we need to connect our
+Arduino to the computer and software. Firstly, connect the Arduino to the
+computer via USB, then launch the Arduino
+software and set the port to the one connected which is labelled as
+<code>Arduino Uno</code> (sometimes you just need to try them all).</p>
+<p>Now that the board is connected we can start uploading programs allowing us to
+control the inputs and outputs.</p>
+<p>In computer science there is a long tradition of test something with a program
+which outputs the words "Hello world!". Because the Arduino doesn't have a
+screen (yet) we opt for the much lower tech solution of blinking a LED which
+is the "Hello World!" equivalent for Arduino.</p>
+<pre><code class="hljs language-arduino"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setup</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-comment">// initialize digital pin LED_BUILTIN as an output.</span>
+  <span class="hljs-built_in">pinMode</span>(<span class="hljs-literal">LED_BUILTIN</span>, <span class="hljs-literal">OUTPUT</span>); 
+}
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">loop</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-comment">// write the LED pin high turning it on.</span>
+  <span class="hljs-built_in">digitalWrite</span>(<span class="hljs-literal">LED_BUILTIN</span>, <span class="hljs-literal">HIGH</span>);
+  <span class="hljs-built_in">delay</span>(<span class="hljs-number">1000</span>); <span class="hljs-comment">// do nothing for 1000 milliseconds (1 sec)</span>
+  <span class="hljs-comment">// write the LED pin low turning it off.</span>
+  <span class="hljs-built_in">digitalWrite</span>(<span class="hljs-literal">LED_BUILTIN</span>, <span class="hljs-literal">LOW</span>);
+  <span class="hljs-built_in">delay</span>(<span class="hljs-number">1000</span>); <span class="hljs-comment">// wait again</span>
+}
+</code></pre>
+<p>Above is the basic blink sketch provided. Arduino makes it very easy for us by
+providing simple functions for setting and interacting with the Arduino hardware.
+The functions used are annotated in the sketch.</p>
+<h3>Blink Different</h3>
+<p>Now that we know the Arduino is working we can start changing the sketch to do
+something a little more interesting!</p>
+<p><strong>Connecting an external LED</strong></p>
+<p>We can use a breadboard to connect a LED to the Arduino. A 220Ω resistor is
+added to reduce the voltage across the LED which is designed for a lower voltage
+than 5V. Pin 12 is used as the digital output which is then referenced in the
+code below.</p>
+<p><strong>East Cardinal Mark</strong></p>
+<p>Instead of simply turning on and off the LED we now flash the LED with the pattern
+of an East Cardinal Mark which shows there is safe water to the East of the light
+when you are out on a boat!</p>
+<p><img src="/basic_led.png" alt="led"></p>
+<pre><code class="hljs language-arduino"><span class="hljs-meta">#<span class="hljs-keyword">define</span> PIN 12 <span class="hljs-comment">// or LED_BUILTIN</span></span>
+
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setup</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-comment">// initialize digital pin LED_BUILTIN as an output.</span>
+  <span class="hljs-built_in">pinMode</span>(PIN, <span class="hljs-literal">OUTPUT</span>);
+}
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">loop</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-comment">// East cardinal mark</span>
+  <span class="hljs-built_in">digitalWrite</span>(PIN, <span class="hljs-literal">HIGH</span>);
+  <span class="hljs-built_in">delay</span>(<span class="hljs-number">400</span>);
+  <span class="hljs-built_in">digitalWrite</span>(PIN, <span class="hljs-literal">LOW</span>);
+  <span class="hljs-built_in">delay</span>(<span class="hljs-number">400</span>);
+  <span class="hljs-built_in">digitalWrite</span>(PIN, <span class="hljs-literal">HIGH</span>);
+  <span class="hljs-built_in">delay</span>(<span class="hljs-number">400</span>);
+  <span class="hljs-built_in">digitalWrite</span>(PIN, <span class="hljs-literal">LOW</span>);
+  <span class="hljs-built_in">delay</span>(<span class="hljs-number">400</span>);
+  <span class="hljs-built_in">digitalWrite</span>(PIN, <span class="hljs-literal">HIGH</span>);
+  <span class="hljs-built_in">delay</span>(<span class="hljs-number">400</span>);
+  <span class="hljs-built_in">digitalWrite</span>(PIN, <span class="hljs-literal">LOW</span>);
+  <span class="hljs-built_in">delay</span>(<span class="hljs-number">5000</span>);
+}
+</code></pre>
+<p><img src="/cardinal_east_night.gif" alt="Cardinal East Buoy Light">
+<em>Cardinal East Buoy Light (shows there is safe water to the East of the light)</em>
+<em><a href="https://www.msq.qld.gov.au/Safety/Navigation-buoys-marks-and-beacons">Source</a></em></p>
+<h2>Buttons and Buzzing Along</h2>
+<p>Instead of just connecting an output LED I can now connect a potentiometer as an
+input which is printed out to the serial as well as controlling an LED. This
+allows the LED be dimmed by moving the potentiometer.</p>
+<p>The code below maps the potentiometer input to a PWM output connected to an LED.</p>
+<pre><code class="hljs language-arduino"><span class="hljs-comment">/*
+  This example code is in the public domain.
+
+  https://www.arduino.cc/en/Tutorial/BuiltInExamples/AnalogInOutSerial
+*/</span>
+
+
+<span class="hljs-comment">// These constants won't change. They're used to give names to the pins used:</span>
+<span class="hljs-type">const</span> <span class="hljs-type">int</span> analogInPin = A0;  <span class="hljs-comment">// Analog input pin attached to potentiometer</span>
+<span class="hljs-type">const</span> <span class="hljs-type">int</span> analogOutPin = <span class="hljs-number">9</span>; <span class="hljs-comment">// Analog output pin that the LED is attached to</span>
+
+
+<span class="hljs-type">int</span> sensorValue = <span class="hljs-number">0</span>;        <span class="hljs-comment">// value read from the pot</span>
+<span class="hljs-type">int</span> outputValue = <span class="hljs-number">0</span>;        <span class="hljs-comment">// value output to the PWM (analog out)</span>
+
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setup</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-comment">// initialize serial communications at 9600 bps:</span>
+  <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">begin</span>(<span class="hljs-number">9600</span>);
+
+  <span class="hljs-built_in">pinMode</span>(analogOutPin, <span class="hljs-literal">OUTPUT</span>);
+}
+
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">loop</span><span class="hljs-params">()</span> </span>{
+  <span class="hljs-comment">// read the analog in value:</span>
+  sensorValue = <span class="hljs-built_in">analogRead</span>(analogInPin);
+  <span class="hljs-comment">// map it to the range of the analog out:</span>
+  outputValue = <span class="hljs-built_in">map</span>(sensorValue, <span class="hljs-number">0</span>, <span class="hljs-number">1023</span>, <span class="hljs-number">0</span>, <span class="hljs-number">255</span>);
+  <span class="hljs-comment">// change the analog out value:</span>
+  <span class="hljs-built_in">analogWrite</span>(analogOutPin, outputValue);
+
+  <span class="hljs-comment">// print the results to the Serial Monitor:</span>
+  <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">print</span>(<span class="hljs-string">"sensor = "</span>);
+  <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">print</span>(sensorValue);
+  <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">print</span>(<span class="hljs-string">"\t output = "</span>);
+  <span class="hljs-built_in">Serial</span>.<span class="hljs-built_in">println</span>(outputValue);
+
+  <span class="hljs-comment">// wait 2 milliseconds before the next loop for the analog-to-digital</span>
+  <span class="hljs-comment">// converter to settle after the last reading:</span>
+  <span class="hljs-built_in">delay</span>(<span class="hljs-number">2</span>);
+}
+</code></pre>
+<p><strong>Tones and Lights</strong></p>
+<p>Now that I can read and output a signal, lets output some sound using the piezo
+buzzer. I also replaced the potentiometer with a photoresistor which
+operates in the same way as the potentiometer but responds the light.</p>
+<p>The code changes to use the arduino function <code>tone</code> which allows the output of
+a square wave at a given frequency on a PWN pin.</p>
+<pre><code class="hljs language-arduino"><span class="hljs-built_in">tone</span>(<span class="hljs-number">9</span>, <span class="hljs-number">440</span>) <span class="hljs-comment">// Middle C Freq</span>
+</code></pre>
+<p><img src="/buzzer.jpg" alt="buzzer"></p>
+<p>When you cover the photoresistor the note drops and the note goes higher when
+more light is exposed the photoresistor.</p><!-- HTML_TAG_END -->
+</article></div></main>
+
+<footer class="svelte-1mzt4ot"><div class="svelte-1mzt4ot"><p>Obi Symons © 2022 - <a href="https://creativecommons.org/licenses/by/4.0/" class="svelte-1mzt4ot">Creative Commons Attribution 4.0 International Public License</a> <em>Made with Svelte</em></p></div>
+</footer>
+
+
+		<script type="module" data-hydrate="1yzx8pe">
+		import { start } from "/_app/start-1f164963.js";
+		start({
+			target: document.querySelector('[data-hydrate="1yzx8pe"]').parentNode,
+			paths: {"base":"","assets":""},
+			session: {},
+			route: true,
+			spa: false,
+			trailing_slash: "never",
+			hydrate: {
+				status: 200,
+				error: null,
+				nodes: [
+					import("/_app/pages/__layout.svelte-ff561948.js"),
+						import("/_app/pages/posts/_slug_.svelte-7e7deca4.js")
+				],
+				params: {slug:"week-01-3-blinky-buzzy"},
+				routeId: "posts/[slug]"
+			}
+		});
+	</script><script type="application/json" sveltekit:data-type="props">{"title":"week-01-3-blinky-buzzy","html":"\u003Ch1>Blinky Buzzy － Weeks 1 - 3\u003C/h1>\n\u003Ch2>Arduino!\u003C/h2>\n\u003Cp>\u003Cimg src=\"/leds.png\" alt=\"addressable LEDs!\">\n\u003Cem>A representation of the Federal Senate using addressable LEDs\u003C/em>\u003C/p>\n\u003Cp>I spent a lot of time with Arduino's back in high school mostly creating flashing\nlight displays with addressable LEDs. However, it's been a while since I've used\nArduino as I was wooed away by the fancier microcontrollers such as the ESP32\nwith wifi &#x26; bluetooth and the STM32 with a fast clock rate &#x26; modern(ish)\nCPU architecture.\u003C/p>\n\u003Cp>That being said, I'm looking forward to re-exploring what is a\nwonderful ecosystem and expressive  community of makers.\u003C/p>\n\u003Cp>As I've had a bit of experience building things with Arduino I've combined the\nfirst three weeks of blogs into one.\u003C/p>\n\u003Ch2>Connections and Saying Hello!\u003C/h2>\n\u003Cp>In order to say hello (in an arduino kind of way), we need to connect our\nArduino to the computer and software. Firstly, connect the Arduino to the\ncomputer via USB, then launch the Arduino\nsoftware and set the port to the one connected which is labelled as\n\u003Ccode>Arduino Uno\u003C/code> (sometimes you just need to try them all).\u003C/p>\n\u003Cp>Now that the board is connected we can start uploading programs allowing us to\ncontrol the inputs and outputs.\u003C/p>\n\u003Cp>In computer science there is a long tradition of test something with a program\nwhich outputs the words \"Hello world!\". Because the Arduino doesn't have a\nscreen (yet) we opt for the much lower tech solution of blinking a LED which\nis the \"Hello World!\" equivalent for Arduino.\u003C/p>\n\u003Cpre>\u003Ccode class=\"hljs language-arduino\">\u003Cspan class=\"hljs-function\">\u003Cspan class=\"hljs-type\">void\u003C/span> \u003Cspan class=\"hljs-title\">setup\u003C/span>\u003Cspan class=\"hljs-params\">()\u003C/span> \u003C/span>{\n  \u003Cspan class=\"hljs-comment\">// initialize digital pin LED_BUILTIN as an output.\u003C/span>\n  \u003Cspan class=\"hljs-built_in\">pinMode\u003C/span>(\u003Cspan class=\"hljs-literal\">LED_BUILTIN\u003C/span>, \u003Cspan class=\"hljs-literal\">OUTPUT\u003C/span>); \n}\n\u003Cspan class=\"hljs-function\">\u003Cspan class=\"hljs-type\">void\u003C/span> \u003Cspan class=\"hljs-title\">loop\u003C/span>\u003Cspan class=\"hljs-params\">()\u003C/span> \u003C/span>{\n  \u003Cspan class=\"hljs-comment\">// write the LED pin high turning it on.\u003C/span>\n  \u003Cspan class=\"hljs-built_in\">digitalWrite\u003C/span>(\u003Cspan class=\"hljs-literal\">LED_BUILTIN\u003C/span>, \u003Cspan class=\"hljs-literal\">HIGH\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">delay\u003C/span>(\u003Cspan class=\"hljs-number\">1000\u003C/span>); \u003Cspan class=\"hljs-comment\">// do nothing for 1000 milliseconds (1 sec)\u003C/span>\n  \u003Cspan class=\"hljs-comment\">// write the LED pin low turning it off.\u003C/span>\n  \u003Cspan class=\"hljs-built_in\">digitalWrite\u003C/span>(\u003Cspan class=\"hljs-literal\">LED_BUILTIN\u003C/span>, \u003Cspan class=\"hljs-literal\">LOW\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">delay\u003C/span>(\u003Cspan class=\"hljs-number\">1000\u003C/span>); \u003Cspan class=\"hljs-comment\">// wait again\u003C/span>\n}\n\u003C/code>\u003C/pre>\n\u003Cp>Above is the basic blink sketch provided. Arduino makes it very easy for us by\nproviding simple functions for setting and interacting with the Arduino hardware.\nThe functions used are annotated in the sketch.\u003C/p>\n\u003Ch3>Blink Different\u003C/h3>\n\u003Cp>Now that we know the Arduino is working we can start changing the sketch to do\nsomething a little more interesting!\u003C/p>\n\u003Cp>\u003Cstrong>Connecting an external LED\u003C/strong>\u003C/p>\n\u003Cp>We can use a breadboard to connect a LED to the Arduino. A 220Ω resistor is\nadded to reduce the voltage across the LED which is designed for a lower voltage\nthan 5V. Pin 12 is used as the digital output which is then referenced in the\ncode below.\u003C/p>\n\u003Cp>\u003Cstrong>East Cardinal Mark\u003C/strong>\u003C/p>\n\u003Cp>Instead of simply turning on and off the LED we now flash the LED with the pattern\nof an East Cardinal Mark which shows there is safe water to the East of the light\nwhen you are out on a boat!\u003C/p>\n\u003Cp>\u003Cimg src=\"/basic_led.png\" alt=\"led\">\u003C/p>\n\u003Cpre>\u003Ccode class=\"hljs language-arduino\">\u003Cspan class=\"hljs-meta\">#\u003Cspan class=\"hljs-keyword\">define\u003C/span> PIN 12 \u003Cspan class=\"hljs-comment\">// or LED_BUILTIN\u003C/span>\u003C/span>\n\n\u003Cspan class=\"hljs-function\">\u003Cspan class=\"hljs-type\">void\u003C/span> \u003Cspan class=\"hljs-title\">setup\u003C/span>\u003Cspan class=\"hljs-params\">()\u003C/span> \u003C/span>{\n  \u003Cspan class=\"hljs-comment\">// initialize digital pin LED_BUILTIN as an output.\u003C/span>\n  \u003Cspan class=\"hljs-built_in\">pinMode\u003C/span>(PIN, \u003Cspan class=\"hljs-literal\">OUTPUT\u003C/span>);\n}\n\u003Cspan class=\"hljs-function\">\u003Cspan class=\"hljs-type\">void\u003C/span> \u003Cspan class=\"hljs-title\">loop\u003C/span>\u003Cspan class=\"hljs-params\">()\u003C/span> \u003C/span>{\n  \u003Cspan class=\"hljs-comment\">// East cardinal mark\u003C/span>\n  \u003Cspan class=\"hljs-built_in\">digitalWrite\u003C/span>(PIN, \u003Cspan class=\"hljs-literal\">HIGH\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">delay\u003C/span>(\u003Cspan class=\"hljs-number\">400\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">digitalWrite\u003C/span>(PIN, \u003Cspan class=\"hljs-literal\">LOW\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">delay\u003C/span>(\u003Cspan class=\"hljs-number\">400\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">digitalWrite\u003C/span>(PIN, \u003Cspan class=\"hljs-literal\">HIGH\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">delay\u003C/span>(\u003Cspan class=\"hljs-number\">400\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">digitalWrite\u003C/span>(PIN, \u003Cspan class=\"hljs-literal\">LOW\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">delay\u003C/span>(\u003Cspan class=\"hljs-number\">400\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">digitalWrite\u003C/span>(PIN, \u003Cspan class=\"hljs-literal\">HIGH\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">delay\u003C/span>(\u003Cspan class=\"hljs-number\">400\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">digitalWrite\u003C/span>(PIN, \u003Cspan class=\"hljs-literal\">LOW\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">delay\u003C/span>(\u003Cspan class=\"hljs-number\">5000\u003C/span>);\n}\n\u003C/code>\u003C/pre>\n\u003Cp>\u003Cimg src=\"/cardinal_east_night.gif\" alt=\"Cardinal East Buoy Light\">\n\u003Cem>Cardinal East Buoy Light (shows there is safe water to the East of the light)\u003C/em>\n\u003Cem>\u003Ca href=\"https://www.msq.qld.gov.au/Safety/Navigation-buoys-marks-and-beacons\">Source\u003C/a>\u003C/em>\u003C/p>\n\u003Ch2>Buttons and Buzzing Along\u003C/h2>\n\u003Cp>Instead of just connecting an output LED I can now connect a potentiometer as an\ninput which is printed out to the serial as well as controlling an LED. This\nallows the LED be dimmed by moving the potentiometer.\u003C/p>\n\u003Cp>The code below maps the potentiometer input to a PWM output connected to an LED.\u003C/p>\n\u003Cpre>\u003Ccode class=\"hljs language-arduino\">\u003Cspan class=\"hljs-comment\">/*\n  This example code is in the public domain.\n\n  https://www.arduino.cc/en/Tutorial/BuiltInExamples/AnalogInOutSerial\n*/\u003C/span>\n\n\n\u003Cspan class=\"hljs-comment\">// These constants won't change. They're used to give names to the pins used:\u003C/span>\n\u003Cspan class=\"hljs-type\">const\u003C/span> \u003Cspan class=\"hljs-type\">int\u003C/span> analogInPin = A0;  \u003Cspan class=\"hljs-comment\">// Analog input pin attached to potentiometer\u003C/span>\n\u003Cspan class=\"hljs-type\">const\u003C/span> \u003Cspan class=\"hljs-type\">int\u003C/span> analogOutPin = \u003Cspan class=\"hljs-number\">9\u003C/span>; \u003Cspan class=\"hljs-comment\">// Analog output pin that the LED is attached to\u003C/span>\n\n\n\u003Cspan class=\"hljs-type\">int\u003C/span> sensorValue = \u003Cspan class=\"hljs-number\">0\u003C/span>;        \u003Cspan class=\"hljs-comment\">// value read from the pot\u003C/span>\n\u003Cspan class=\"hljs-type\">int\u003C/span> outputValue = \u003Cspan class=\"hljs-number\">0\u003C/span>;        \u003Cspan class=\"hljs-comment\">// value output to the PWM (analog out)\u003C/span>\n\n\u003Cspan class=\"hljs-function\">\u003Cspan class=\"hljs-type\">void\u003C/span> \u003Cspan class=\"hljs-title\">setup\u003C/span>\u003Cspan class=\"hljs-params\">()\u003C/span> \u003C/span>{\n  \u003Cspan class=\"hljs-comment\">// initialize serial communications at 9600 bps:\u003C/span>\n  \u003Cspan class=\"hljs-built_in\">Serial\u003C/span>.\u003Cspan class=\"hljs-built_in\">begin\u003C/span>(\u003Cspan class=\"hljs-number\">9600\u003C/span>);\n\n  \u003Cspan class=\"hljs-built_in\">pinMode\u003C/span>(analogOutPin, \u003Cspan class=\"hljs-literal\">OUTPUT\u003C/span>);\n}\n\n\u003Cspan class=\"hljs-function\">\u003Cspan class=\"hljs-type\">void\u003C/span> \u003Cspan class=\"hljs-title\">loop\u003C/span>\u003Cspan class=\"hljs-params\">()\u003C/span> \u003C/span>{\n  \u003Cspan class=\"hljs-comment\">// read the analog in value:\u003C/span>\n  sensorValue = \u003Cspan class=\"hljs-built_in\">analogRead\u003C/span>(analogInPin);\n  \u003Cspan class=\"hljs-comment\">// map it to the range of the analog out:\u003C/span>\n  outputValue = \u003Cspan class=\"hljs-built_in\">map\u003C/span>(sensorValue, \u003Cspan class=\"hljs-number\">0\u003C/span>, \u003Cspan class=\"hljs-number\">1023\u003C/span>, \u003Cspan class=\"hljs-number\">0\u003C/span>, \u003Cspan class=\"hljs-number\">255\u003C/span>);\n  \u003Cspan class=\"hljs-comment\">// change the analog out value:\u003C/span>\n  \u003Cspan class=\"hljs-built_in\">analogWrite\u003C/span>(analogOutPin, outputValue);\n\n  \u003Cspan class=\"hljs-comment\">// print the results to the Serial Monitor:\u003C/span>\n  \u003Cspan class=\"hljs-built_in\">Serial\u003C/span>.\u003Cspan class=\"hljs-built_in\">print\u003C/span>(\u003Cspan class=\"hljs-string\">\"sensor = \"\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">Serial\u003C/span>.\u003Cspan class=\"hljs-built_in\">print\u003C/span>(sensorValue);\n  \u003Cspan class=\"hljs-built_in\">Serial\u003C/span>.\u003Cspan class=\"hljs-built_in\">print\u003C/span>(\u003Cspan class=\"hljs-string\">\"\\t output = \"\u003C/span>);\n  \u003Cspan class=\"hljs-built_in\">Serial\u003C/span>.\u003Cspan class=\"hljs-built_in\">println\u003C/span>(outputValue);\n\n  \u003Cspan class=\"hljs-comment\">// wait 2 milliseconds before the next loop for the analog-to-digital\u003C/span>\n  \u003Cspan class=\"hljs-comment\">// converter to settle after the last reading:\u003C/span>\n  \u003Cspan class=\"hljs-built_in\">delay\u003C/span>(\u003Cspan class=\"hljs-number\">2\u003C/span>);\n}\n\u003C/code>\u003C/pre>\n\u003Cp>\u003Cstrong>Tones and Lights\u003C/strong>\u003C/p>\n\u003Cp>Now that I can read and output a signal, lets output some sound using the piezo\nbuzzer. I also replaced the potentiometer with a photoresistor which\noperates in the same way as the potentiometer but responds the light.\u003C/p>\n\u003Cp>The code changes to use the arduino function \u003Ccode>tone\u003C/code> which allows the output of\na square wave at a given frequency on a PWN pin.\u003C/p>\n\u003Cpre>\u003Ccode class=\"hljs language-arduino\">\u003Cspan class=\"hljs-built_in\">tone\u003C/span>(\u003Cspan class=\"hljs-number\">9\u003C/span>, \u003Cspan class=\"hljs-number\">440\u003C/span>) \u003Cspan class=\"hljs-comment\">// Middle C Freq\u003C/span>\n\u003C/code>\u003C/pre>\n\u003Cp>\u003Cimg src=\"/buzzer.jpg\" alt=\"buzzer\">\u003C/p>\n\u003Cp>When you cover the photoresistor the note drops and the note goes higher when\nmore light is exposed the photoresistor.\u003C/p>"}</script>
+	</body>
+</html>

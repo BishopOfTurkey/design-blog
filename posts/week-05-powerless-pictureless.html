@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="description" content="" />
+		<link rel="icon" href="../favicon.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta http-equiv="content-security-policy" content=""><title>week-05-powerless-pictureless | DESN2010 Blog</title>
+	<link rel="stylesheet" href="/_app/assets/pages/__layout.svelte-85f7ebf5.css">
+	<link rel="stylesheet" href="/_app/assets/pages/posts/_slug_.svelte-7d1e5a95.css">
+	<link rel="modulepreload" href="/_app/start-1f164963.js">
+	<link rel="modulepreload" href="/_app/chunks/vendor-0cbe9c9d.js">
+	<link rel="modulepreload" href="/_app/pages/__layout.svelte-ff561948.js">
+	<link rel="modulepreload" href="/_app/pages/posts/_slug_.svelte-7e7deca4.js">
+	</head>
+	<body>
+		
+
+
+<header class="svelte-1mzt4ot"><div class="svelte-1mzt4ot"><h1><a href="/" class="svelte-1mzt4ot">DESN2010 Blog</a></h1></div></header>
+
+<main class="svelte-1mzt4ot"><div class="svelte-1mzt4ot">
+
+<article class="svelte-1wchouu"><!-- HTML_TAG_START --><h1>Powerless, Pictureless － Week 4</h1>
+<p>This week I worked with Harrison to connect a servo motor, stepper motor and a
+small display to the Arduino with varying levels of success.</p>
+<h2>Stepper Motor</h2>
+<p><img src="https://cdn-learn.adafruit.com/assets/assets/000/009/516/medium800/adafruit_products_steppertest.jpg" alt="Stepper shield">
+<em>Source: <a href="https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino/using-stepper-motors">Adafruit</a></em></p>
+<p>Firstly we followed <a href="https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino/using-stepper-motors">this guide from Adafruit</a>
+to connect the stepper motor to the Arduino using the shield.</p>
+<p>A stepper motor is a very precise motor capable of powerful yet accurate movement.
+Although they can't move very quickly they used extensively in robotics and 3d printing.</p>
+<p>The first step was to install
+a library to enable communication between the shield and Arduino. This, in theory,
+allows us to communicate to the chip on the shield in charge of controlling the
+stepper motor. After successfully installing the library and uploading the example
+sketch to the board... nothing happened. We checked all the connections and noticed
+that the power LED on the board was off, and we still needed to connect a jumper
+to enable power to be drawn through the Arduino. Even after connecting this jumper
+nothing happened :(. We did a bit more research we discovered that the shield
+needed to be powered by a external power supply which we didn't have access to.
+Since we were at an impasse we tried another actuator.</p>
+<h2>Servo Motor</h2>
+<p><img src="/360-servo.jpg" alt="servo"></p>
+<p>Servo motors are DC motors with a potentiometer connected to them so they can
+know their position. They are simple to control and very versatile with many
+different sizes and power levels. One of the main disadvantages is that they
+usually have a small range of about 180 degrees, this limits their application
+to actuators which only need to move back and forth rather than continuous
+movement.</p>
+<p>The Arduino IDE comes with a built in servo library which makes it very easy to
+use them. Simply connect the 5V and Ground wires to power and connect the control
+wire to any PWM pin.</p>
+<p>Servo Example Sketch:</p>
+<pre><code class="hljs language-arduino"><span class="hljs-comment">/*
+ Controlling a servo position using a potentiometer (variable resistor)
+ by Michal Rinott &#x3C;http://people.interaction-ivrea.it/m.rinott>
+
+ modified on 8 Nov 2013
+ by Scott Fitzgerald
+ http://www.arduino.cc/en/Tutorial/Knob
+*/</span>
+
+<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&#x3C;Servo.h></span></span>
+
+<span class="hljs-built_in">Servo</span> myservo;  <span class="hljs-comment">// create servo object to control a servo</span>
+
+<span class="hljs-type">int</span> potpin = A0;  <span class="hljs-comment">// analog pin used to connect the potentiometer</span>
+<span class="hljs-type">int</span> val;    <span class="hljs-comment">// variable to read the value from the analog pin</span>
+
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">setup</span><span class="hljs-params">()</span> </span>{
+  myservo.<span class="hljs-built_in">attach</span>(<span class="hljs-number">9</span>);  <span class="hljs-comment">// attaches the servo on pin 9 to the servo object</span>
+}
+
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">loop</span><span class="hljs-params">()</span> </span>{
+  val = <span class="hljs-built_in">analogRead</span>(potpin);
+  val = <span class="hljs-built_in">map</span>(val, <span class="hljs-number">0</span>, <span class="hljs-number">1023</span>, <span class="hljs-number">0</span>, <span class="hljs-number">180</span>);   
+  myservo.<span class="hljs-built_in">write</span>(val);
+  <span class="hljs-built_in">delay</span>(<span class="hljs-number">15</span>);
+}
+</code></pre>
+<p>We successfully did this with a spare servo motor I had!</p>
+<h2>Display</h2>
+<p><img src="/tft_display.jpg" alt="display">
+<em>That's probably not how it should look :(</em></p>
+<p>Our final actuator was a small display I had from a previous project a few years
+back. I was drawn to this screen as it is a simple way of communicating
+information to the user of a system.</p>
+<p>Following <a href="https://www.electronics-lab.com/project/using-1-44-color-tft-display-ili9163c-arduino/">this guide</a>
+from electronics-lab we connected up the wires, installed the library (which was
+a major hassle) and uploaded the sample sketch. Unfortunately it did not work,
+we were presented with a black screen on a jumbled mess. We didn't have much time
+to troubleshoot the issues before this weeks class ended.</p>
+<h2>Thoughts</h2>
+<p>This week gave me a good experience working with and debugging different components.
+I saw some good opportunities to use the servo motor in my first project.</p><!-- HTML_TAG_END -->
+</article></div></main>
+
+<footer class="svelte-1mzt4ot"><div class="svelte-1mzt4ot"><p>Obi Symons © 2022 - <a href="https://creativecommons.org/licenses/by/4.0/" class="svelte-1mzt4ot">Creative Commons Attribution 4.0 International Public License</a> <em>Made with Svelte</em></p></div>
+</footer>
+
+
+		<script type="module" data-hydrate="qd9jys">
+		import { start } from "/_app/start-1f164963.js";
+		start({
+			target: document.querySelector('[data-hydrate="qd9jys"]').parentNode,
+			paths: {"base":"","assets":""},
+			session: {},
+			route: true,
+			spa: false,
+			trailing_slash: "never",
+			hydrate: {
+				status: 200,
+				error: null,
+				nodes: [
+					import("/_app/pages/__layout.svelte-ff561948.js"),
+						import("/_app/pages/posts/_slug_.svelte-7e7deca4.js")
+				],
+				params: {slug:"week-05-powerless-pictureless"},
+				routeId: "posts/[slug]"
+			}
+		});
+	</script><script type="application/json" sveltekit:data-type="props">{"title":"week-05-powerless-pictureless","html":"\u003Ch1>Powerless, Pictureless － Week 4\u003C/h1>\n\u003Cp>This week I worked with Harrison to connect a servo motor, stepper motor and a\nsmall display to the Arduino with varying levels of success.\u003C/p>\n\u003Ch2>Stepper Motor\u003C/h2>\n\u003Cp>\u003Cimg src=\"https://cdn-learn.adafruit.com/assets/assets/000/009/516/medium800/adafruit_products_steppertest.jpg\" alt=\"Stepper shield\">\n\u003Cem>Source: \u003Ca href=\"https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino/using-stepper-motors\">Adafruit\u003C/a>\u003C/em>\u003C/p>\n\u003Cp>Firstly we followed \u003Ca href=\"https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino/using-stepper-motors\">this guide from Adafruit\u003C/a>\nto connect the stepper motor to the Arduino using the shield.\u003C/p>\n\u003Cp>A stepper motor is a very precise motor capable of powerful yet accurate movement.\nAlthough they can't move very quickly they used extensively in robotics and 3d printing.\u003C/p>\n\u003Cp>The first step was to install\na library to enable communication between the shield and Arduino. This, in theory,\nallows us to communicate to the chip on the shield in charge of controlling the\nstepper motor. After successfully installing the library and uploading the example\nsketch to the board... nothing happened. We checked all the connections and noticed\nthat the power LED on the board was off, and we still needed to connect a jumper\nto enable power to be drawn through the Arduino. Even after connecting this jumper\nnothing happened :(. We did a bit more research we discovered that the shield\nneeded to be powered by a external power supply which we didn't have access to.\nSince we were at an impasse we tried another actuator.\u003C/p>\n\u003Ch2>Servo Motor\u003C/h2>\n\u003Cp>\u003Cimg src=\"/360-servo.jpg\" alt=\"servo\">\u003C/p>\n\u003Cp>Servo motors are DC motors with a potentiometer connected to them so they can\nknow their position. They are simple to control and very versatile with many\ndifferent sizes and power levels. One of the main disadvantages is that they\nusually have a small range of about 180 degrees, this limits their application\nto actuators which only need to move back and forth rather than continuous\nmovement.\u003C/p>\n\u003Cp>The Arduino IDE comes with a built in servo library which makes it very easy to\nuse them. Simply connect the 5V and Ground wires to power and connect the control\nwire to any PWM pin.\u003C/p>\n\u003Cp>Servo Example Sketch:\u003C/p>\n\u003Cpre>\u003Ccode class=\"hljs language-arduino\">\u003Cspan class=\"hljs-comment\">/*\n Controlling a servo position using a potentiometer (variable resistor)\n by Michal Rinott &#x3C;http://people.interaction-ivrea.it/m.rinott>\n\n modified on 8 Nov 2013\n by Scott Fitzgerald\n http://www.arduino.cc/en/Tutorial/Knob\n*/\u003C/span>\n\n\u003Cspan class=\"hljs-meta\">#\u003Cspan class=\"hljs-keyword\">include\u003C/span> \u003Cspan class=\"hljs-string\">&#x3C;Servo.h>\u003C/span>\u003C/span>\n\n\u003Cspan class=\"hljs-built_in\">Servo\u003C/span> myservo;  \u003Cspan class=\"hljs-comment\">// create servo object to control a servo\u003C/span>\n\n\u003Cspan class=\"hljs-type\">int\u003C/span> potpin = A0;  \u003Cspan class=\"hljs-comment\">// analog pin used to connect the potentiometer\u003C/span>\n\u003Cspan class=\"hljs-type\">int\u003C/span> val;    \u003Cspan class=\"hljs-comment\">// variable to read the value from the analog pin\u003C/span>\n\n\u003Cspan class=\"hljs-function\">\u003Cspan class=\"hljs-type\">void\u003C/span> \u003Cspan class=\"hljs-title\">setup\u003C/span>\u003Cspan class=\"hljs-params\">()\u003C/span> \u003C/span>{\n  myservo.\u003Cspan class=\"hljs-built_in\">attach\u003C/span>(\u003Cspan class=\"hljs-number\">9\u003C/span>);  \u003Cspan class=\"hljs-comment\">// attaches the servo on pin 9 to the servo object\u003C/span>\n}\n\n\u003Cspan class=\"hljs-function\">\u003Cspan class=\"hljs-type\">void\u003C/span> \u003Cspan class=\"hljs-title\">loop\u003C/span>\u003Cspan class=\"hljs-params\">()\u003C/span> \u003C/span>{\n  val = \u003Cspan class=\"hljs-built_in\">analogRead\u003C/span>(potpin);\n  val = \u003Cspan class=\"hljs-built_in\">map\u003C/span>(val, \u003Cspan class=\"hljs-number\">0\u003C/span>, \u003Cspan class=\"hljs-number\">1023\u003C/span>, \u003Cspan class=\"hljs-number\">0\u003C/span>, \u003Cspan class=\"hljs-number\">180\u003C/span>);   \n  myservo.\u003Cspan class=\"hljs-built_in\">write\u003C/span>(val);\n  \u003Cspan class=\"hljs-built_in\">delay\u003C/span>(\u003Cspan class=\"hljs-number\">15\u003C/span>);\n}\n\u003C/code>\u003C/pre>\n\u003Cp>We successfully did this with a spare servo motor I had!\u003C/p>\n\u003Ch2>Display\u003C/h2>\n\u003Cp>\u003Cimg src=\"/tft_display.jpg\" alt=\"display\">\n\u003Cem>That's probably not how it should look :(\u003C/em>\u003C/p>\n\u003Cp>Our final actuator was a small display I had from a previous project a few years\nback. I was drawn to this screen as it is a simple way of communicating\ninformation to the user of a system.\u003C/p>\n\u003Cp>Following \u003Ca href=\"https://www.electronics-lab.com/project/using-1-44-color-tft-display-ili9163c-arduino/\">this guide\u003C/a>\nfrom electronics-lab we connected up the wires, installed the library (which was\na major hassle) and uploaded the sample sketch. Unfortunately it did not work,\nwe were presented with a black screen on a jumbled mess. We didn't have much time\nto troubleshoot the issues before this weeks class ended.\u003C/p>\n\u003Ch2>Thoughts\u003C/h2>\n\u003Cp>This week gave me a good experience working with and debugging different components.\nI saw some good opportunities to use the servo motor in my first project.\u003C/p>"}</script>
+	</body>
+</html>
