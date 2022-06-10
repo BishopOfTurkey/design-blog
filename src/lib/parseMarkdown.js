@@ -7,9 +7,9 @@ import rehypeHighlight from 'rehype-highlight'
 
 const processor = unified()
   .use(remarkParse)
-  .use(remarkRehype)
+  .use(remarkRehype, {allowDangerousHtml: true})
   .use(rehypeHighlight)
-  .use(rehypeStringify)
+  .use(rehypeStringify, {allowDangerousHtml: true})
 
 export function process(markdown) {
   const result = processor.processSync(markdown);

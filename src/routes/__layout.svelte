@@ -16,7 +16,7 @@
 
 <footer>
   <div>
-    <p>Made with Svelte</p>
+    <p>Obi Symons © 2022 - <a href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International Public License</a> <em>Made with Svelte</em></p>
   </div>
 </footer>
 
